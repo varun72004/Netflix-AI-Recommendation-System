@@ -1,0 +1,8 @@
+{
+  "model_path": "artifacts\\svd_model.joblib",
+  "model_library": "joblib",
+  "model_class": "surprise.SVD",
+  "latest_prediction_path": "artifacts\\predictions_user_1331154.json",
+  "default_user_id": 1331154,
+  "train_rows": 100000
+}

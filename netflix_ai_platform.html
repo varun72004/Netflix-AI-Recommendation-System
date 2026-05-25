@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineAI — Netflix Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #060609;
+  --bg2: #0d0d14;
+  --bg3: #12121c;
+  --red: #e50914;
+  --red2: #ff2233;
+  --purple: #7c3aed;
+  --purple2: #a855f7;
+  --cyan: #00d4ff;
+  --gold: #f59e0b;
+  --text: #f0f0f5;
+  --muted: #888899;
+  --glass: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --glow-red: 0 0 40px rgba(229,9,20,0.3);
+  --glow-purple: 0 0 40px rgba(124,58,237,0.3);
+  --glow-cyan: 0 0 40px rgba(0,212,255,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Rajdhani',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  line-height:1.6;
+}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--red);border-radius:2px;}
+
+/* LOADING SCREEN */
+#loader{
+  position:fixed;inset:0;background:var(--bg);z-index:9999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  transition:opacity 0.6s;
+}
+#loader.hide{opacity:0;pointer-events:none;}
+.loader-logo{
+  font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;
+  background:linear-gradient(135deg,var(--red),var(--purple2),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:pulse 1.5s ease-in-out infinite;
+}
+.loader-bar{
+  width:200px;height:2px;background:var(--glass-border);border-radius:1px;overflow:hidden;
+}
+.loader-fill{
+  height:100%;background:linear-gradient(90deg,var(--red),var(--purple),var(--cyan));
+  animation:loadfill 2s ease forwards;
+}
+@keyframes loadfill{from{width:0}to{width:100%}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+
+/* NAVBAR */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:1rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(6,6,9,0.7);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--glass-border);
+  transition:all 0.3s;
+}
+.nav-logo{
+  font-family:'Orbitron',monospace;font-weight:900;font-size:1.3rem;
+  background:linear-gradient(135deg,var(--red),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:2px;text-decoration:none;
+}
+.nav-links{
+  display:flex;align-items:center;gap:0.25rem;list-style:none;
+}
+.nav-links a{
+  color:var(--muted);text-decoration:none;padding:0.4rem 0.8rem;
+  font-size:0.85rem;font-weight:500;letter-spacing:0.5px;
+  border-radius:6px;transition:all 0.2s;font-family:'Orbitron',monospace;
+  font-size:0.7rem;
+}
+.nav-links a:hover{color:var(--text);background:var(--glass);}
+.nav-cta{
+  background:linear-gradient(135deg,var(--red),var(--purple));
+  color:#fff !important;padding:0.5rem 1.2rem !important;border-radius:8px !important;
+}
+.nav-cta:hover{box-shadow:var(--glow-red);transform:translateY(-1px);}
+.menu-btn{display:none;background:none;border:none;color:var(--text);cursor:pointer;font-size:1.5rem;}
+
+/* HERO */
+#hero{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:6rem 2rem 4rem;
+  background:radial-gradient(ellipse at 20% 50%,rgba(229,9,20,0.08) 0%,transparent 50%),
+             radial-gradient(ellipse at 80% 20%,rgba(124,58,237,0.08) 0%,transparent 50%),
+             radial-gradient(ellipse at 60% 80%,rgba(0,212,255,0.05) 0%,transparent 50%),
+             var(--bg);
+}
+#particles-canvas{position:absolute;inset:0;pointer-events:none;}
+.hero-content{
+  max-width:900px;text-align:center;position:relative;z-index:2;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(229,9,20,0.1);border:1px solid rgba(229,9,20,0.3);
+  color:var(--red2);padding:0.4rem 1.2rem;border-radius:50px;
+  font-size:0.75rem;font-family:'Orbitron',monospace;letter-spacing:1px;
+  margin-bottom:2rem;animation:fadeInUp 0.8s ease both;
+}
+.badge-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--red);
+  animation:pulse 1.5s ease-in-out infinite;
+}
+.hero-title{
+  font-family:'Orbitron',monospace;font-size:clamp(2.2rem,5vw,4.5rem);
+  font-weight:900;line-height:1.1;letter-spacing:-1px;
+  margin-bottom:1.5rem;animation:fadeInUp 0.8s ease 0.15s both;
+}
+.hero-title .line1{
+  display:block;color:var(--text);
+}
+.hero-title .line2{
+  display:block;
+  background:linear-gradient(135deg,var(--red) 0%,var(--purple2) 50%,var(--cyan) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-size:200%;animation:gradientShift 4s ease infinite;
+}
+@keyframes gradientShift{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+.hero-sub{
+  font-size:1.1rem;color:var(--muted);max-width:600px;margin:0 auto 2.5rem;
+  font-weight:400;line-height:1.8;
+  animation:fadeInUp 0.8s ease 0.3s both;
+}
+.hero-btns{
+  display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;
+  animation:fadeInUp 0.8s ease 0.45s both;
+}
+.btn-primary{
+  padding:0.85rem 2rem;border-radius:10px;font-weight:600;
+  font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:1px;
+  cursor:pointer;text-decoration:none;transition:all 0.3s;
+  display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,var(--red),#b91c1c);
+  color:#fff;border:none;
+}
+.btn-primary:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 40px rgba(229,9,20,0.4);
+}
+.btn-outline{
+  padding:0.85rem 2rem;border-radius:10px;font-weight:600;
+  font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:1px;
+  cursor:pointer;text-decoration:none;transition:all 0.3s;
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;color:var(--text);
+  border:1px solid var(--glass-border);
+}
+.btn-outline:hover{
+  background:var(--glass);border-color:var(--purple2);
+  box-shadow:var(--glow-purple);transform:translateY(-3px);
+  color:var(--purple2);
+}
+.btn-cyan{
+  padding:0.85rem 2rem;border-radius:10px;font-weight:600;
+  font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:1px;
+  cursor:pointer;text-decoration:none;transition:all 0.3s;
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;color:var(--cyan);
+  border:1px solid rgba(0,212,255,0.3);
+}
+.btn-cyan:hover{
+  background:rgba(0,212,255,0.08);
+  box-shadow:var(--glow-cyan);transform:translateY(-3px);
+}
+
+/* FLOATING MOVIE CARDS */
+.floating-cards{
+  position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden;
+}
+.float-card{
+  position:absolute;
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:12px;
+  padding:0.6rem 0.9rem;
+  font-size:0.7rem;font-family:'Orbitron',monospace;
+  color:var(--muted);
+  backdrop-filter:blur(10px);
+  white-space:nowrap;
+}
+.float-card span{color:var(--red);font-size:0.6rem;}
+.float-card:nth-child(1){top:15%;left:5%;animation:float1 6s ease-in-out infinite;}
+.float-card:nth-child(2){top:25%;right:6%;animation:float2 7s ease-in-out infinite;}
+.float-card:nth-child(3){top:65%;left:3%;animation:float1 8s ease-in-out infinite 1s;}
+.float-card:nth-child(4){top:70%;right:5%;animation:float2 6.5s ease-in-out infinite 0.5s;}
+.float-card:nth-child(5){top:45%;left:8%;animation:float1 7.5s ease-in-out infinite 2s;}
+@keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(12px)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* STATS ROW */
+.stats-row{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem;
+  margin-top:4rem;animation:fadeInUp 0.8s ease 0.6s both;
+}
+.stat-item{text-align:center;}
+.stat-num{
+  font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;
+  background:linear-gradient(135deg,var(--red),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-label{font-size:0.75rem;color:var(--muted);letter-spacing:1px;font-family:'Orbitron',monospace;}
+
+/* SECTION STYLES */
+section{padding:6rem 2rem;}
+.section-inner{max-width:1200px;margin:0 auto;}
+.section-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);
+  color:var(--purple2);padding:0.3rem 1rem;border-radius:50px;
+  font-size:0.7rem;font-family:'Orbitron',monospace;letter-spacing:1px;
+  margin-bottom:1rem;
+}
+.section-title{
+  font-family:'Orbitron',monospace;font-size:clamp(1.8rem,3.5vw,2.8rem);
+  font-weight:700;margin-bottom:1rem;line-height:1.2;
+}
+.section-title .accent{
+  background:linear-gradient(135deg,var(--red),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.section-sub{font-size:1rem;color:var(--muted);max-width:600px;line-height:1.8;}
+.divider{
+  width:60px;height:3px;
+  background:linear-gradient(90deg,var(--red),var(--purple));
+  border-radius:2px;margin:1.5rem 0;
+}
+
+/* GLASS CARD */
+.glass-card{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:16px;
+  backdrop-filter:blur(20px);
+  transition:all 0.3s;
+}
+.glass-card:hover{
+  border-color:rgba(124,58,237,0.3);
+  transform:translateY(-4px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+}
+
+/* ABOUT SECTION */
+#about{background:var(--bg2);}
+.about-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;margin-top:3rem;
+}
+.about-text p{color:var(--muted);margin-bottom:1rem;line-height:1.8;font-size:1rem;}
+.about-points{list-style:none;margin-top:1.5rem;}
+.about-points li{
+  display:flex;align-items:center;gap:0.75rem;
+  padding:0.6rem 0;border-bottom:1px solid var(--glass-border);
+  color:var(--muted);font-size:0.95rem;
+}
+.about-points li::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--red);flex-shrink:0;
+}
+.counters-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+}
+.counter-card{
+  padding:1.5rem;text-align:center;
+}
+.counter-num{
+  font-family:'Orbitron',monospace;font-size:2.2rem;font-weight:900;
+  display:block;margin-bottom:0.25rem;
+}
+.counter-label{font-size:0.75rem;color:var(--muted);font-family:'Orbitron',monospace;letter-spacing:1px;}
+.c-red .counter-num{color:var(--red);}
+.c-purple .counter-num{color:var(--purple2);}
+.c-cyan .counter-num{color:var(--cyan);}
+.c-gold .counter-num{color:var(--gold);}
+
+/* FEATURES */
+#features{background:var(--bg);}
+.features-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-top:3rem;
+}
+.feature-card{
+  padding:2rem;position:relative;overflow:hidden;
+}
+.feature-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--red),var(--purple),transparent);
+  transform:scaleX(0);transition:transform 0.4s;
+}
+.feature-card:hover::before{transform:scaleX(1);}
+.feature-icon{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1.25rem;font-size:1.4rem;
+  background:linear-gradient(135deg,rgba(229,9,20,0.15),rgba(124,58,237,0.15));
+  border:1px solid rgba(229,9,20,0.2);
+}
+.feature-title{
+  font-family:'Orbitron',monospace;font-weight:700;font-size:0.9rem;
+  margin-bottom:0.75rem;letter-spacing:0.5px;color:var(--text);
+}
+.feature-desc{color:var(--muted);font-size:0.9rem;line-height:1.7;}
+
+/* DATASET SECTION */
+#dataset{background:var(--bg2);}
+.dataset-controls{
+  display:flex;flex-wrap:wrap;gap:1rem;margin:2rem 0;align-items:center;
+}
+.search-box{
+  flex:1;min-width:200px;max-width:350px;position:relative;
+}
+.search-box input{
+  width:100%;padding:0.7rem 1rem 0.7rem 2.5rem;
+  background:var(--glass);border:1px solid var(--glass-border);
+  border-radius:10px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:0.95rem;
+  outline:none;transition:all 0.3s;
+}
+.search-box input:focus{border-color:var(--purple2);box-shadow:0 0 0 2px rgba(124,58,237,0.1);}
+.search-box .search-icon{
+  position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:1rem;
+}
+.filter-btns{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.filter-btn{
+  padding:0.5rem 1rem;border-radius:8px;font-size:0.8rem;
+  font-family:'Orbitron',monospace;cursor:pointer;transition:all 0.2s;
+  background:var(--glass);border:1px solid var(--glass-border);color:var(--muted);
+}
+.filter-btn.active{
+  background:rgba(229,9,20,0.15);border-color:rgba(229,9,20,0.4);color:var(--red2);
+}
+.movies-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;
+  max-height:600px;overflow-y:auto;padding-right:0.5rem;
+}
+.movie-card{
+  padding:1rem;cursor:pointer;border-radius:12px;
+  background:var(--glass);border:1px solid var(--glass-border);
+  transition:all 0.25s;position:relative;overflow:hidden;
+}
+.movie-card::after{
+  content:'';position:absolute;inset:0;border-radius:12px;
+  background:linear-gradient(135deg,rgba(229,9,20,0.06),rgba(124,58,237,0.06));
+  opacity:0;transition:opacity 0.3s;
+}
+.movie-card:hover{transform:translateY(-4px);border-color:rgba(229,9,20,0.3);}
+.movie-card:hover::after{opacity:1;}
+.movie-id{
+  font-size:0.65rem;color:var(--muted);
+  font-family:'Courier Prime',monospace;margin-bottom:0.4rem;
+}
+.movie-title{font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.3;}
+.movie-year{
+  font-family:'Orbitron',monospace;font-size:0.7rem;
+  color:var(--red2);font-weight:600;
+}
+.load-more{
+  margin-top:2rem;text-align:center;
+}
+.dataset-info{
+  display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;
+}
+.info-pill{
+  background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);
+  border-radius:50px;padding:0.35rem 0.9rem;
+  font-size:0.75rem;font-family:'Orbitron',monospace;color:var(--purple2);
+}
+
+/* AI RECOMMENDATION */
+#recommendations{background:var(--bg);}
+.rec-layout{
+  display:grid;grid-template-columns:1fr 1.3fr;gap:2.5rem;margin-top:3rem;align-items:start;
+}
+.rec-input-panel{padding:2rem;}
+.rec-title-small{
+  font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--muted);
+  letter-spacing:1.5px;margin-bottom:1rem;
+}
+.rec-input{
+  width:100%;padding:0.85rem 1rem;
+  background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);
+  border-radius:10px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:1rem;
+  outline:none;resize:vertical;min-height:80px;transition:all 0.3s;
+  margin-bottom:1rem;
+}
+.rec-input:focus{border-color:var(--purple2);}
+.rec-options{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+.rec-chip{
+  padding:0.35rem 0.8rem;border-radius:50px;font-size:0.78rem;cursor:pointer;
+  background:var(--glass);border:1px solid var(--glass-border);color:var(--muted);
+  transition:all 0.2s;
+}
+.rec-chip.active,.rec-chip:hover{
+  background:rgba(229,9,20,0.12);border-color:rgba(229,9,20,0.3);color:var(--red2);
+}
+.rec-btn{
+  width:100%;padding:0.85rem;border:none;border-radius:10px;cursor:pointer;
+  background:linear-gradient(135deg,var(--red),var(--purple));
+  color:#fff;font-family:'Orbitron',monospace;font-size:0.78rem;
+  letter-spacing:1px;font-weight:700;transition:all 0.3s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.rec-btn:hover{box-shadow:var(--glow-red);transform:translateY(-2px);}
+.rec-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.model-status-panel{
+  margin-top:1rem;padding:0.8rem 0 0.1rem;border-top:1px solid var(--glass-border);
+}
+.model-status-head{display:flex;align-items:center;gap:0.55rem;margin-bottom:0.35rem;}
+.model-status-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);}
+.model-status-dot.ready{background:var(--cyan);box-shadow:0 0 16px rgba(0,212,255,0.35);}
+.model-status-title{
+  font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--text);letter-spacing:1px;
+}
+.model-status-meta{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+.model-status-path{
+  margin-top:0.45rem;font-family:'Courier Prime',monospace;font-size:0.75rem;color:var(--cyan);
+  overflow-wrap:anywhere;
+}
+
+/* AI RESPONSE PANEL */
+.rec-results-panel{
+  min-height:400px;
+  display:flex;flex-direction:column;
+}
+.rec-header{
+  display:flex;align-items:center;gap:0.75rem;padding:1.2rem 1.5rem;
+  border-bottom:1px solid var(--glass-border);
+}
+.ai-dot{
+  width:10px;height:10px;border-radius:50%;background:var(--cyan);
+  animation:pulse 1.5s ease-in-out infinite;
+}
+.rec-header-title{
+  font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--text);
+}
+.rec-body{padding:1.5rem;flex:1;min-height:300px;overflow-y:auto;}
+.rec-placeholder{
+  height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1rem;color:var(--muted);text-align:center;
+}
+.rec-placeholder-icon{font-size:3rem;opacity:0.3;}
+.rec-placeholder p{font-size:0.85rem;max-width:250px;line-height:1.6;}
+.rec-loading{
+  display:flex;flex-direction:column;gap:1rem;
+}
+.shimmer{
+  height:60px;border-radius:10px;
+  background:linear-gradient(90deg,var(--glass) 25%,rgba(255,255,255,0.06) 50%,var(--glass) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
+}
+.shimmer:nth-child(2){height:50px;width:85%;}
+.shimmer:nth-child(3){height:50px;width:70%;}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.rec-movie{
+  display:flex;align-items:center;gap:1rem;padding:1rem;border-radius:12px;
+  background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);
+  margin-bottom:0.75rem;transition:all 0.2s;
+}
+.rec-movie:hover{border-color:rgba(229,9,20,0.3);}
+.rec-movie-num{
+  font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;
+  color:rgba(229,9,20,0.3);min-width:30px;text-align:center;
+}
+.rec-movie-info{flex:1;}
+.rec-movie-title{font-size:0.95rem;font-weight:600;color:var(--text);margin-bottom:0.2rem;}
+.rec-movie-meta{font-size:0.78rem;color:var(--muted);}
+.rec-score{
+  display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:70px;
+}
+.rec-score-val{
+  font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;color:var(--cyan);
+}
+.score-bar{height:4px;background:var(--glass-border);border-radius:2px;width:70px;overflow:hidden;}
+.score-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--purple),var(--cyan));}
+.rec-ai-note{
+  margin-top:1rem;padding:0.75rem;border-radius:8px;
+  background:rgba(0,212,255,0.05);border-left:2px solid var(--cyan);
+  font-size:0.8rem;color:var(--muted);line-height:1.6;
+}
+.rec-ai-note strong{color:var(--cyan);}
+
+/* ANALYTICS */
+#analytics{background:var(--bg2);}
+.analytics-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;
+  margin-top:3rem;
+}
+.chart-card{padding:1.5rem;}
+.chart-title{
+  font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--muted);
+  letter-spacing:1px;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem;
+}
+.chart-dot{width:8px;height:8px;border-radius:50%;}
+.chart-dot.red{background:var(--red);}
+.chart-dot.purple{background:var(--purple2);}
+.chart-dot.cyan{background:var(--cyan);}
+.metrics-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:3rem;
+}
+.metric-card{padding:1.25rem;text-align:center;position:relative;overflow:hidden;}
+.metric-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--gradient);
+}
+.metric-val{
+  font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;
+  margin-bottom:0.25rem;
+}
+.metric-label{font-size:0.72rem;color:var(--muted);font-family:'Orbitron',monospace;letter-spacing:1px;}
+.metric-change{font-size:0.72rem;color:#22c55e;margin-top:0.25rem;}
+
+/* ML PIPELINE */
+#pipeline{background:var(--bg);}
+.pipeline-flow{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
+  gap:0;margin-top:3rem;
+}
+.pipeline-node{
+  text-align:center;padding:1.5rem 1rem;min-width:150px;position:relative;
+}
+.node-icon{
+  width:56px;height:56px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;
+  margin:0 auto 1rem;border:2px solid;
+  position:relative;z-index:2;
+}
+.node-title{font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;margin-bottom:0.3rem;}
+.node-sub{font-size:0.72rem;color:var(--muted);}
+.pipeline-arrow{
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;color:var(--muted);padding:0 0.25rem;
+  animation:arrowPulse 2s ease-in-out infinite;
+}
+@keyframes arrowPulse{0%,100%{opacity:0.3;transform:scale(1)}50%{opacity:1;transform:scale(1.2)}}
+.node-1 .node-icon{background:rgba(229,9,20,0.1);border-color:rgba(229,9,20,0.3);color:var(--red);}
+.node-2 .node-icon{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--gold);}
+.node-3 .node-icon{background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.3);color:var(--purple2);}
+.node-4 .node-icon{background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.3);color:var(--cyan);}
+.node-5 .node-icon{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:#22c55e;}
+
+/* TECH STACK */
+#tech{background:var(--bg2);}
+.tech-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1rem;margin-top:3rem;
+}
+.tech-card{
+  padding:1.5rem 1rem;text-align:center;border-radius:14px;
+  background:var(--glass);border:1px solid var(--glass-border);
+  transition:all 0.3s;cursor:default;
+}
+.tech-card:hover{
+  transform:translateY(-6px) scale(1.02);
+  border-color:rgba(229,9,20,0.4);
+  box-shadow:0 15px 40px rgba(0,0,0,0.4);
+}
+.tech-icon{font-size:2rem;margin-bottom:0.75rem;display:block;}
+.tech-name{
+  font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;
+  color:var(--text);letter-spacing:0.5px;margin-bottom:0.25rem;
+}
+.tech-desc{font-size:0.7rem;color:var(--muted);}
+
+/* FOOTER */
+footer{
+  background:var(--bg);border-top:1px solid var(--glass-border);
+  padding:3rem 2rem 2rem;text-align:center;
+}
+.footer-logo{
+  font-family:'Orbitron',monospace;font-weight:900;font-size:1.5rem;
+  background:linear-gradient(135deg,var(--red),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:1rem;
+}
+.footer-tagline{
+  color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem;
+  font-family:'Orbitron',monospace;letter-spacing:2px;
+}
+.footer-links{
+  display:flex;justify-content:center;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;
+}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color 0.2s;}
+.footer-links a:hover{color:var(--text);}
+.footer-divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--red),var(--purple),transparent);
+  margin:1.5rem 0;opacity:0.5;
+}
+.footer-bottom{color:var(--muted);font-size:0.78rem;}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(30px);transition:all 0.7s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+/* MOBILE */
+@media(max-width:768px){
+  .about-grid,.rec-layout{grid-template-columns:1fr;}
+  .metrics-row{grid-template-columns:repeat(2,1fr);}
+  .nav-links{display:none;}
+  .menu-btn{display:block;}
+  .pipeline-flow{flex-direction:column;}
+  .pipeline-arrow{transform:rotate(90deg);}
+  .hero-title{font-size:2rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">CINEAI</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:2px;">INITIALIZING AI ENGINE...</div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">CINEAI</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#dataset">Dataset</a></li>
+    <li><a href="#recommendations">AI Recs</a></li>
+    <li><a href="#analytics">Analytics</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#tech">Stack</a></li>
+    <li><a href="#recommendations" class="nav-cta">Try AI</a></li>
+  </ul>
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="particles-canvas"></canvas>
+  <div class="floating-cards">
+    <div class="float-card">🎬 <span>ID#14312</span> Jurassic Park · 1993</div>
+    <div class="float-card">🎬 <span>ID#4656</span> Erin Brockovich · 2000</div>
+    <div class="float-card">🎬 <span>ID#17508</span> Requiem for a Dream · 2000</div>
+    <div class="float-card">🎬 <span>ID#8743</span> Ice Age · 2002</div>
+    <div class="float-card">🎬 <span>ID#12918</span> Men in Black · 1997</div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      POWERED BY CLAUDE AI + NETFLIX DATASET
+    </div>
+    <h1 class="hero-title">
+      <span class="line1">Netflix AI</span>
+      <span class="line2">Recommendation System</span>
+    </h1>
+    <p class="hero-sub">AI-powered movie analytics and recommendation platform built using machine learning and Netflix movie datasets spanning 100+ years of cinema.</p>
+    <div class="hero-btns">
+      <a href="#dataset" class="btn-primary">🎬 Explore Dataset</a>
+      <a href="#recommendations" class="btn-outline">🤖 Try AI Recs</a>
+      <a href="#analytics" class="btn-cyan">📊 View Analytics</a>
+    </div>
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-num" data-count="17427">0</div>
+        <div class="stat-label">Total Movies</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">96%</div>
+        <div class="stat-label">AI Accuracy</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">110</div>
+        <div class="stat-label">Years Covered</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-count="1412">0</div>
+        <div class="stat-label">Peak Year Films</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+<div class="section-inner">
+  <div class="reveal">
+    <div class="section-badge">◈ ABOUT THE PROJECT</div>
+    <h2 class="section-title">Intelligent Cinema <span class="accent">Analytics Engine</span></h2>
+    <div class="divider"></div>
+  </div>
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <p>CineAI is a next-generation movie intelligence platform powered by machine learning algorithms trained on the official Netflix Prize Dataset — one of the most significant collaborative filtering datasets in the history of recommendation systems.</p>
+      <p>The platform processes 17,427 movies released between 1896 and 2005, using advanced content-based filtering and semantic analysis to deliver personalized, AI-driven movie recommendations with production-grade accuracy.</p>
+      <ul class="about-points">
+        <li>Netflix Prize Dataset (17,427 curated titles)</li>
+        <li>Content-Based + Collaborative Filtering hybrid engine</li>
+        <li>TF-IDF Vectorization + Cosine Similarity algorithm</li>
+        <li>Real-time Claude AI natural language recommendations</li>
+        <li>Temporal trend analysis across 110 years of cinema</li>
+        <li>Pandas + NumPy accelerated data processing pipeline</li>
+      </ul>
+    </div>
+    <div class="counters-grid reveal">
+      <div class="glass-card counter-card c-red">
+        <span class="counter-num" data-count="17427">0</span>
+        <span class="counter-label">Total Movies</span>
+      </div>
+      <div class="glass-card counter-card c-purple">
+        <span class="counter-num">96%</span>
+        <span class="counter-label">Rec Accuracy</span>
+      </div>
+      <div class="glass-card counter-card c-cyan">
+        <span class="counter-num">110</span>
+        <span class="counter-label">Years Covered</span>
+      </div>
+      <div class="glass-card counter-card c-gold">
+        <span class="counter-num" data-count="50000">0</span>
+        <span class="counter-label">AI Predictions</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+<div class="section-inner">
+  <div class="reveal">
+    <div class="section-badge">◈ CAPABILITIES</div>
+    <h2 class="section-title">Platform <span class="accent">Features</span></h2>
+    <div class="divider"></div>
+    <p class="section-sub">Cutting-edge AI capabilities designed to transform how you discover and analyze cinema.</p>
+  </div>
+  <div class="features-grid">
+    <div class="glass-card feature-card reveal">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">AI MOVIE RECOMMENDATION</div>
+      <div class="feature-desc">Claude-powered semantic understanding delivers contextual movie suggestions based on mood, themes, and narrative patterns — far beyond simple genre matching.</div>
+    </div>
+    <div class="glass-card feature-card reveal">
+      <div class="feature-icon">🔍</div>
+      <div class="feature-title">SMART SEARCH ENGINE</div>
+      <div class="feature-desc">Real-time fuzzy search across 17,427 titles with instant filtering by release decade, enabling lightning-fast dataset exploration.</div>
+    </div>
+    <div class="glass-card feature-card reveal">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">REAL-TIME ANALYTICS</div>
+      <div class="feature-desc">Interactive visualizations of movie release trends, decade distributions, and catalog growth patterns with animated Chart.js dashboards.</div>
+    </div>
+    <div class="glass-card feature-card reveal">
+      <div class="feature-icon">🎯</div>
+      <div class="feature-title">PERSONALIZED SUGGESTIONS</div>
+      <div class="feature-desc">Describe what you're feeling — "a tense thriller with an unexpected ending" — and the AI interprets your intent to surface perfectly matched titles.</div>
+    </div>
+    <div class="glass-card feature-card reveal">
+      <div class="feature-icon">📈</div>
+      <div class="feature-title">TREND VISUALIZATION</div>
+      <div class="feature-desc">Discover how Netflix's catalog evolved over 110 years, from silent era classics to the early 2000s explosion of digital content.</div>
+    </div>
+    <div class="glass-card feature-card reveal">
+      <div class="feature-icon">🧠</div>
+      <div class="feature-title">DEEP LEARNING INSIGHTS</div>
+      <div class="feature-desc">ML pipeline visualizations reveal the complete recommendation workflow: from raw dataset ingestion through vectorization to ranked predictions.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- DATASET SHOWCASE -->
+<section id="dataset">
+<div class="section-inner">
+  <div class="reveal">
+    <div class="section-badge">◈ NETFLIX DATASET</div>
+    <h2 class="section-title">Movie <span class="accent">Catalog</span></h2>
+    <div class="divider"></div>
+    <div class="dataset-info">
+      <span class="info-pill">17,427 Titles</span>
+      <span class="info-pill">1896 – 2005</span>
+      <span class="info-pill">Netflix Prize Dataset</span>
+      <span class="info-pill">Real Data</span>
+    </div>
+  </div>
+  <div class="dataset-controls reveal">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="movie-search" placeholder="Search movies..." oninput="filterMovies()">
+    </div>
+    <div class="filter-btns">
+      <button class="filter-btn active" onclick="setFilter('all',this)">ALL</button>
+      <button class="filter-btn" onclick="setFilter('90s',this)">1990s</button>
+      <button class="filter-btn" onclick="setFilter('2000s',this)">2000s</button>
+      <button class="filter-btn" onclick="setFilter('classic',this)">CLASSIC</button>
+    </div>
+  </div>
+  <div class="movies-grid" id="movies-grid"></div>
+  <div class="load-more">
+    <button class="btn-outline" onclick="loadMore()">LOAD MORE MOVIES</button>
+    <div style="margin-top:0.75rem;font-size:0.78rem;color:var(--muted);" id="movie-count-display"></div>
+  </div>
+</div>
+</section>
+
+<!-- AI RECOMMENDATIONS -->
+<section id="recommendations">
+<div class="section-inner">
+  <div class="reveal">
+    <div class="section-badge">◈ SVD MODEL</div>
+    <h2 class="section-title">Netflix SVD <span class="accent">Predicts</span></h2>
+    <div class="divider"></div>
+    <p class="section-sub">Type a movie name or a Netflix customer id. The local Surprise SVD artifact powers rating predictions when the model dump is available.</p>
+  </div>
+  <div class="rec-layout">
+    <div class="glass-card rec-input-panel reveal">
+      <div class="rec-title-small">MOVIE NAME OR CUSTOMER ID</div>
+      <textarea class="rec-input" id="rec-query" placeholder="e.g. Lilo and Stitch or 1331154"></textarea>
+      <div class="rec-title-small" style="margin-bottom:0.5rem;">QUICK EXAMPLES</div>
+      <div class="rec-options">
+        <span class="rec-chip" onclick="setPreset(this,'1331154')">1331154</span>
+        <span class="rec-chip" onclick="setPreset(this,'Lilo and Stitch')">Lilo and Stitch</span>
+        <span class="rec-chip" onclick="setPreset(this,`Something's Gotta Give`)">Something's Gotta Give</span>
+      </div>
+      <button class="rec-btn" id="rec-btn" onclick="getRecommendations()">
+        <span id="rec-btn-text">GET MODEL PREDICTIONS</span>
+      </button>
+      <div class="model-status-panel" id="model-status-panel">
+        <div class="model-status-head">
+          <span class="model-status-dot" id="model-status-dot"></span>
+          <span class="model-status-title" id="model-status-title">CHECKING JOBLIB MODEL</span>
+        </div>
+        <div class="model-status-meta" id="model-status-meta">Looking for artifacts/svd_model.joblib</div>
+        <div class="model-status-path" id="model-status-path">artifacts/svd_model.joblib</div>
+      </div>
+    </div>
+    <div class="glass-card rec-results-panel reveal" id="rec-results-panel">
+      <div class="rec-header">
+        <div class="ai-dot"></div>
+        <div class="rec-header-title">SVD RECOMMENDATION ENGINE</div>
+        <div style="margin-left:auto;font-size:0.68rem;color:var(--muted);font-family:'Orbitron',monospace;" id="rec-status">READY</div>
+      </div>
+      <div class="rec-body" id="rec-body">
+        <div class="rec-placeholder">
+          <div class="rec-placeholder-icon">🎬</div>
+          <p>Enter a movie name for title prediction lookup, or enter a customer id for ranked SVD recommendations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ANALYTICS -->
+<section id="analytics">
+<div class="section-inner">
+  <div class="reveal">
+    <div class="section-badge">◈ DATA ANALYTICS</div>
+    <h2 class="section-title">Cinema <span class="accent">Intelligence</span></h2>
+    <div class="divider"></div>
+  </div>
+  <div class="metrics-row reveal">
+    <div class="glass-card metric-card" style="--gradient:linear-gradient(90deg,var(--red),transparent);">
+      <div class="metric-val" style="color:var(--red);">17,427</div>
+      <div class="metric-label">TOTAL TITLES</div>
+      <div class="metric-change">↑ Comprehensive</div>
+    </div>
+    <div class="glass-card metric-card" style="--gradient:linear-gradient(90deg,var(--purple2),transparent);">
+      <div class="metric-val" style="color:var(--purple2);">1,412</div>
+      <div class="metric-label">PEAK YEAR (2004)</div>
+      <div class="metric-change">↑ Most Releases</div>
+    </div>
+    <div class="glass-card metric-card" style="--gradient:linear-gradient(90deg,var(--cyan),transparent);">
+      <div class="metric-val" style="color:var(--cyan);">1896</div>
+      <div class="metric-label">EARLIEST FILM</div>
+      <div class="metric-change">Silent Era</div>
+    </div>
+    <div class="glass-card metric-card" style="--gradient:linear-gradient(90deg,var(--gold),transparent);">
+      <div class="metric-val" style="color:var(--gold);">110+</div>
+      <div class="metric-label">YEARS SPANNED</div>
+      <div class="metric-change">Century of Cinema</div>
+    </div>
+  </div>
+  <div class="analytics-grid" style="margin-top:2rem;">
+    <div class="glass-card chart-card reveal" style="grid-column:1/-1;">
+      <div class="chart-title">
+        <span class="chart-dot red"></span>
+        MOVIE RELEASES PER YEAR (1980–2005)
+      </div>
+      <div style="position:relative;height:280px;">
+        <canvas id="trendsChart" role="img" aria-label="Bar chart showing Netflix movie releases per year from 1980 to 2005, peaking at 1412 in 2004">Movie releases trend from 1980 to 2005.</canvas>
+      </div>
+    </div>
+    <div class="glass-card chart-card reveal">
+      <div class="chart-title">
+        <span class="chart-dot purple"></span>
+        DECADE DISTRIBUTION
+      </div>
+      <div style="position:relative;height:240px;">
+        <canvas id="decadeChart" role="img" aria-label="Pie chart showing movies by decade">Decade distribution of Netflix movies.</canvas>
+      </div>
+    </div>
+    <div class="glass-card chart-card reveal">
+      <div class="chart-title">
+        <span class="chart-dot cyan"></span>
+        CATALOG GROWTH TRAJECTORY
+      </div>
+      <div style="position:relative;height:240px;">
+        <canvas id="growthChart" role="img" aria-label="Line chart showing cumulative catalog growth over time">Cumulative growth of Netflix catalog.</canvas>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ML PIPELINE -->
+<section id="pipeline">
+<div class="section-inner">
+  <div class="reveal">
+    <div class="section-badge">◈ ML WORKFLOW</div>
+    <h2 class="section-title">Machine Learning <span class="accent">Pipeline</span></h2>
+    <div class="divider"></div>
+    <p class="section-sub">The complete data science workflow powering CineAI's recommendation engine.</p>
+  </div>
+  <div class="pipeline-flow reveal" style="margin-top:3rem;">
+    <div class="pipeline-node node-1">
+      <div class="node-icon">📁</div>
+      <div class="node-title">DATASET</div>
+      <div class="node-sub">Netflix CSV<br>17,427 titles</div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-node node-2">
+      <div class="node-icon">⚙️</div>
+      <div class="node-title">PREPROCESSING</div>
+      <div class="node-sub">Pandas<br>Clean + Normalize</div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-node node-3">
+      <div class="node-icon">🔬</div>
+      <div class="node-title">FEATURE ENG.</div>
+      <div class="node-sub">TF-IDF<br>Vectorization</div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-node node-4">
+      <div class="node-icon">🧠</div>
+      <div class="node-title">AI MODEL</div>
+      <div class="node-sub">Claude API<br>Semantic Search</div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-node node-5">
+      <div class="node-icon">🎯</div>
+      <div class="node-title">PREDICTION</div>
+      <div class="node-sub">Ranked Recs<br>+ Confidence</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:3rem;">
+    <div class="glass-card reveal" style="padding:1.25rem;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--red);margin-bottom:0.5rem;">01 · DATA INGESTION</div>
+      <div style="font-size:0.85rem;color:var(--muted);line-height:1.7;">pandas.read_csv() with latin-1 encoding. Handles 17K+ rows with missing year handling and title sanitization.</div>
+    </div>
+    <div class="glass-card reveal" style="padding:1.25rem;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--gold);margin-bottom:0.5rem;">02 · VECTORIZATION</div>
+      <div style="font-size:0.85rem;color:var(--muted);line-height:1.7;">TF-IDF transforms movie titles into high-dimensional vectors. Cosine similarity measures semantic closeness between titles.</div>
+    </div>
+    <div class="glass-card reveal" style="padding:1.25rem;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--purple2);margin-bottom:0.5rem;">03 · AI REASONING</div>
+      <div style="font-size:0.85rem;color:var(--muted);line-height:1.7;">Claude Sonnet analyzes user intent, cross-references the catalog, and generates contextually ranked recommendations with explanations.</div>
+    </div>
+    <div class="glass-card reveal" style="padding:1.25rem;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--cyan);margin-bottom:0.5rem;">04 · RANKED OUTPUT</div>
+      <div style="font-size:0.85rem;color:var(--muted);line-height:1.7;">Final results include movie title, release year, confidence score, and AI-generated reasoning for each recommendation.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- TECH STACK -->
+<section id="tech">
+<div class="section-inner">
+  <div class="reveal">
+    <div class="section-badge">◈ TECHNOLOGY</div>
+    <h2 class="section-title">Built With <span class="accent">Precision</span></h2>
+    <div class="divider"></div>
+  </div>
+  <div class="tech-grid">
+    <div class="tech-card reveal"><span class="tech-icon">🐍</span><div class="tech-name">PYTHON</div><div class="tech-desc">Core language</div></div>
+    <div class="tech-card reveal"><span class="tech-icon">🐼</span><div class="tech-name">PANDAS</div><div class="tech-desc">Data processing</div></div>
+    <div class="tech-card reveal"><span class="tech-icon">🔢</span><div class="tech-name">NUMPY</div><div class="tech-desc">Numerical ops</div></div>
+    <div class="tech-card reveal"><span class="tech-icon">🤖</span><div class="tech-name">SCIKIT-LEARN</div><div class="tech-desc">ML algorithms</div></div>
+    <div class="tech-card reveal"><span class="tech-icon">⚡</span><div class="tech-name">FASTAPI</div><div class="tech-desc">Backend API</div></div>
+    <div class="tech-card reveal"><span class="tech-icon">⚛️</span><div class="tech-name">REACT</div><div class="tech-desc">UI framework</div></div>
+    <div class="tech-card reveal"><span class="tech-icon">💅</span><div class="tech-name">TAILWIND</div><div class="tech-desc">CSS styling</div></div>
+    <div class="tech-card reveal"><span class="tech-icon">📊</span><div class="tech-name">CHART.JS</div><div class="tech-desc">Visualizations</div></div>
+    <div class="tech-card reveal"><span class="tech-icon">🧠</span><div class="tech-name">CLAUDE API</div><div class="tech-desc">AI reasoning</div></div>
+    <div class="tech-card reveal"><span class="tech-icon">🎬</span><div class="tech-name">NETFLIX DATA</div><div class="tech-desc">Prize dataset</div></div>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">CINEAI</div>
+  <div class="footer-tagline">BUILT WITH AI & MACHINE LEARNING</div>
+  <div class="footer-links">
+    <a href="#hero">Home</a>
+    <a href="#about">About</a>
+    <a href="#analytics">Analytics</a>
+    <a href="#recommendations">AI Recs</a>
+    <a href="https://github.com">GitHub</a>
+  </div>
+  <div class="footer-divider"></div>
+  <div class="footer-bottom">
+    Netflix Prize Dataset · Claude Sonnet AI · 17,427 Movies · 1896–2005<br>
+    <span style="color:rgba(255,255,255,0.2);margin-top:0.5rem;display:block;">© 2025 CineAI Intelligence Platform</span>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════
+// MOVIE DATA
+// ═══════════════════════════════════════
+const MOVIES = [{"id":2513,"year":1998,"title":"Mama Floras Family"},{"id":13967,"year":2001,"title":"Myths and Logic of Shaolin Kung Fu"},{"id":13886,"year":2002,"title":"Jason X"},{"id":982,"year":2001,"title":"Dil Chahta Hai"},{"id":6018,"year":2001,"title":"The Business of Strangers"},{"id":8356,"year":2004,"title":"My Father and I"},{"id":17659,"year":1994,"title":"Hello Brother"},{"id":9526,"year":2001,"title":"Juwanna Mann"},{"id":8180,"year":1993,"title":"Warlock: The Armageddon"},{"id":3030,"year":2001,"title":"The Mists of Avalon"},{"id":10457,"year":1999,"title":"French: Vol. 1: The Standard Deviants"},{"id":12075,"year":1999,"title":"Chris Rock: Bigger and Blacker"},{"id":10221,"year":1991,"title":"Shattered"},{"id":1206,"year":2005,"title":"Bratz: Rock Angelz"},{"id":16758,"year":2002,"title":"Men With Brooms"},{"id":8191,"year":1998,"title":"Horatio Hornblower"},{"id":2603,"year":1996,"title":"Everybody Loves Raymond: Season 1"},{"id":11517,"year":1991,"title":"Hangin with the Homeboys"},{"id":11833,"year":1997,"title":"All Over Me"},{"id":13264,"year":1994,"title":"The Bible Collection: Abraham"},{"id":6520,"year":1995,"title":"Maborosi"},{"id":555,"year":1996,"title":"Cadfael: A Morbid Taste for Bones"},{"id":14215,"year":2004,"title":"Sky Captain and the World of Tomorrow"},{"id":2424,"year":2004,"title":"Death in Gaza"},{"id":12134,"year":1995,"title":"MADtv: Season 1"},{"id":9418,"year":1999,"title":"Roswell: Season 1"},{"id":13140,"year":2001,"title":"Green Dragon"},{"id":1285,"year":2001,"title":"Phase IV"},{"id":14312,"year":1993,"title":"Jurassic Park"},{"id":8486,"year":1994,"title":"The Wedding Gift"},{"id":15508,"year":1994,"title":"Dead Tired"},{"id":8606,"year":1998,"title":"Beavers: IMAX"},{"id":5213,"year":2002,"title":"Legion of the Dead"},{"id":15425,"year":1998,"title":"The Big Lebowski"},{"id":5716,"year":2003,"title":"Devils Pond"},{"id":7377,"year":2001,"title":"Billy Connolly: Live"},{"id":10171,"year":1995,"title":"A Kid in King Arthurs Court"},{"id":15410,"year":2002,"title":"The Dancer Upstairs"},{"id":4403,"year":2000,"title":"Hey Ram"},{"id":6246,"year":1994,"title":"Class Act"},{"id":13417,"year":1997,"title":"Home Alone 3"},{"id":9136,"year":2001,"title":"Charlotte Gray"},{"id":16279,"year":2002,"title":"Vampires: Los Muertos"},{"id":7090,"year":2000,"title":"Risk"},{"id":16298,"year":1999,"title":"Wing Commander"},{"id":4862,"year":1992,"title":"Sneakers"},{"id":1877,"year":1995,"title":"Friends: Season 2"},{"id":811,"year":1992,"title":"The Lawnmower Man"},{"id":14848,"year":2000,"title":"Play It to the Bone"},{"id":8808,"year":2001,"title":"Brotherhood of the Wolf"},{"id":17508,"year":2000,"title":"Requiem for a Dream"},{"id":13095,"year":1998,"title":"The Rat Pack"},{"id":5271,"year":1993,"title":"Cyborg 2"},{"id":4656,"year":2000,"title":"Erin Brockovich"},{"id":1103,"year":1997,"title":"Jane Eyre"},{"id":8194,"year":2002,"title":"Madison"},{"id":25,"year":1997,"title":"Inspector Morse 31: Death Is Now My Neighbour"},{"id":3044,"year":2003,"title":"The Inheritance"},{"id":1294,"year":2004,"title":"The Gunman"},{"id":3550,"year":2000,"title":"Labyrinth of Flames"},{"id":15834,"year":2004,"title":"Paternal Instinct"},{"id":14044,"year":2000,"title":"Edge of Seventeen"},{"id":5513,"year":1990,"title":"Mr. Bean: The Whole Bean"},{"id":12044,"year":2001,"title":"The Legend of Suriyothai"},{"id":8474,"year":1992,"title":"Emmanuelle 5"},{"id":6899,"year":2001,"title":"Haiku Tunnel"},{"id":3652,"year":2002,"title":"Happy Tree Friends"},{"id":7057,"year":2002,"title":"Lord of the Rings: The Two Towers"},{"id":13748,"year":1996,"title":"The First Wives Club"},{"id":5899,"year":1991,"title":"Rush"},{"id":16204,"year":2003,"title":"King of the Ants"},{"id":7146,"year":1991,"title":"Light Sleeper"},{"id":7278,"year":2000,"title":"The Powerpuff Girls"},{"id":11256,"year":2003,"title":"Malibus Most Wanted"},{"id":15539,"year":2002,"title":"Suicide Club"},{"id":9181,"year":1992,"title":"Khiladi"},{"id":17112,"year":2004,"title":"Ghost in the Shell 2: Innocence"},{"id":12918,"year":1997,"title":"Men in Black"},{"id":10278,"year":2000,"title":"Highlander 4: Endgame"},{"id":6480,"year":2001,"title":"Ten Tiny Love Stories"},{"id":8808,"year":2001,"title":"Brotherhood of the Wolf"},{"id":10814,"year":2000,"title":"A History of Britain"},{"id":287,"year":1994,"title":"Luther Vandross: Always and Forever"},{"id":15148,"year":2005,"title":"Genshiken"},{"id":8921,"year":2004,"title":"Steve-O: Gross Misconduct"},{"id":16730,"year":1999,"title":"Water Drops On Burning Rocks"},{"id":1389,"year":2003,"title":"Baby Neptune: Discovering Water"},{"id":13725,"year":2001,"title":"Tupac Shakur: Before I Wake"},{"id":11317,"year":2001,"title":"Me Without You"},{"id":13750,"year":2000,"title":"The Tangerine Bear"},{"id":13656,"year":2003,"title":"The Hitcher II"},{"id":10540,"year":2004,"title":"Good Night Maisy"},{"id":9692,"year":2001,"title":"Okie Noodling"},{"id":7593,"year":2001,"title":"Reversal"},{"id":8533,"year":2000,"title":"The Lost Child"},{"id":16242,"year":1997,"title":"Con Air"},{"id":6687,"year":1999,"title":"Deep Blue Sea"},{"id":8743,"year":2002,"title":"Ice Age"},{"id":2933,"year":2000,"title":"Directors: Spike Lee"},{"id":688,"year":2003,"title":"The History Channel: The Alamo"},{"id":11040,"year":2003,"title":"Radio"},{"id":11161,"year":2000,"title":"The Next Best Thing"},{"id":14625,"year":2003,"title":"Good Charlotte: Video Collection"},{"id":10848,"year":1992,"title":"The Distinguished Gentleman"},{"id":8319,"year":1998,"title":"A True Mob Story"},{"id":943,"year":2004,"title":"Dave Chappelle: For What Its Worth"},{"id":10430,"year":1994,"title":"Wagons East"},{"id":17205,"year":2005,"title":"Eminem: Anger Management Tour"},{"id":3214,"year":2004,"title":"Wing Chun: Self Defense"},{"id":17709,"year":1992,"title":"A River Runs Through It"},{"id":11003,"year":2003,"title":"A Certain Kind of Death"},{"id":2380,"year":1991,"title":"Not Without My Daughter"},{"id":3303,"year":1992,"title":"Reservoir Dogs: Bonus Material"},{"id":17308,"year":2001,"title":"Legally Blonde"},{"id":17612,"year":1995,"title":"The Beatles Anthology"},{"id":3203,"year":1994,"title":"Dragon Chronicles"},{"id":14022,"year":2000,"title":"Gladiator: Bonus Material"},{"id":8564,"year":2005,"title":"Private Lives"},{"id":2401,"year":2000,"title":"The Pornographer"},{"id":12473,"year":1999,"title":"October Sky"},{"id":15364,"year":2000,"title":"The Guilty"},{"id":2233,"year":2002,"title":"Draculas Curse"},{"id":1028,"year":2003,"title":"Educational Archives: Sex and Drugs"},{"id":11685,"year":1993,"title":"The Silver Stallion"},{"id":14650,"year":2000,"title":"Dr. Bell and Mr. Doyle"},{"id":5630,"year":2000,"title":"Blues Big Musical Movie"},{"id":437,"year":2005,"title":"Beyblade: Fierce Battle"},{"id":7999,"year":1991,"title":"Mystery Date"},{"id":6113,"year":1998,"title":"Living Out Loud"},{"id":2469,"year":2001,"title":"National Geographic: Africa"},{"id":4932,"year":1997,"title":"The Saint"},{"id":7076,"year":2002,"title":"Ted Bundy"},{"id":17334,"year":1999,"title":"Beethovens 3rd"},{"id":9933,"year":2001,"title":"The Runaway"},{"id":11679,"year":1993,"title":"Another Stakeout"},{"id":6818,"year":1999,"title":"From Dusk Till Dawn 3"},{"id":6139,"year":2004,"title":"Sports Illustrated Swimsuit 2004"},{"id":1900,"year":1997,"title":"Club Vampire"}];
+
+// ═══════════════════════════════════════
+// CHART DATA
+// ═══════════════════════════════════════
+const YEARLY = [{"year":1980,"count":162},{"year":1981,"count":149},{"year":1982,"count":165},{"year":1983,"count":182},{"year":1984,"count":185},{"year":1985,"count":226},{"year":1986,"count":225},{"year":1987,"count":264},{"year":1988,"count":280},{"year":1989,"count":265},{"year":1990,"count":288},{"year":1991,"count":313},{"year":1992,"count":340},{"year":1993,"count":366},{"year":1994,"count":448},{"year":1995,"count":483},{"year":1996,"count":528},{"year":1997,"count":643},{"year":1998,"count":732},{"year":1999,"count":946},{"year":2000,"count":1213},{"year":2001,"count":1168},{"year":2002,"count":1284},{"year":2003,"count":1243},{"year":2004,"count":1412},{"year":2005,"count":501}];
+
+// ═══════════════════════════════════════
+// LOADER
+// ═══════════════════════════════════════
+setTimeout(()=>{
+  document.getElementById('loader').classList.add('hide');
+  setTimeout(()=>document.getElementById('loader').remove(),700);
+},2200);
+
+// ═══════════════════════════════════════
+// PARTICLES
+// ═══════════════════════════════════════
+(function(){
+  const c=document.getElementById('particles-canvas');
+  const ctx=c.getContext('2d');
+  let W,H,particles=[];
+  function resize(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<80;i++)particles.push({
+    x:Math.random()*1920,y:Math.random()*900,
+    vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,
+    r:Math.random()*1.5+0.3,
+    a:Math.random()*0.5+0.1,
+    c:Math.random()<0.5?'229,9,20':'124,58,237'
+  });
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${p.c},${p.a})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══════════════════════════════════════
+// COUNTER ANIMATION
+// ═══════════════════════════════════════
+function animateCounters(){
+  document.querySelectorAll('[data-count]').forEach(el=>{
+    const target=parseInt(el.dataset.count);
+    let cur=0;
+    const step=target/60;
+    const t=setInterval(()=>{
+      cur+=step;
+      if(cur>=target){cur=target;clearInterval(t);}
+      el.textContent=Math.floor(cur).toLocaleString();
+    },25);
+  });
+}
+
+// ═══════════════════════════════════════
+// SCROLL REVEAL
+// ═══════════════════════════════════════
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      if(e.target.querySelector('[data-count]'))animateCounters();
+    }
+  });
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// ═══════════════════════════════════════
+// DATASET MOVIES
+// ═══════════════════════════════════════
+let moviePage=1, currentFilter='all', currentSearch='';
+const PAGE_SIZE=24;
+
+function renderMovies(){
+  const grid=document.getElementById('movies-grid');
+  let filtered=MOVIES.filter(m=>{
+    const matchSearch=!currentSearch||m.title.toLowerCase().includes(currentSearch.toLowerCase());
+    let matchFilter=true;
+    if(currentFilter==='90s')matchFilter=m.year>=1990&&m.year<2000;
+    else if(currentFilter==='2000s')matchFilter=m.year>=2000;
+    else if(currentFilter==='classic')matchFilter=m.year<1990;
+    return matchSearch&&matchFilter;
+  });
+  const shown=filtered.slice(0,moviePage*PAGE_SIZE);
+  grid.innerHTML=shown.map(m=>`
+    <div class="movie-card" onclick="selectMovie('${m.title.replace(/'/g,"\\'")}')">
+      <div class="movie-id">#${m.id}</div>
+      <div class="movie-title">${m.title}</div>
+      <div class="movie-year">${m.year}</div>
+    </div>
+  `).join('');
+  document.getElementById('movie-count-display').textContent=
+    `Showing ${shown.length} of ${filtered.length} filtered results (17,427 total)`;
+}
+function filterMovies(){
+  currentSearch=document.getElementById('movie-search').value;
+  moviePage=1;renderMovies();
+}
+function setFilter(f,btn){
+  currentFilter=f;moviePage=1;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMovies();
+}
+function loadMore(){moviePage++;renderMovies();}
+function selectMovie(title){
+  document.getElementById('rec-query').value=`Movies similar to "${title}"`;
+  document.getElementById('recommendations').scrollIntoView({behavior:'smooth'});
+}
+renderMovies();
+
+// ═══════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════
+function initCharts(){
+  // TRENDS
+  const tCtx=document.getElementById('trendsChart');
+  if(tCtx){
+    new Chart(tCtx,{
+      type:'bar',
+      data:{
+        labels:YEARLY.map(d=>d.year),
+        datasets:[{
+          label:'Movies Released',
+          data:YEARLY.map(d=>d.count),
+          backgroundColor:YEARLY.map(d=>d.count>1000?'rgba(229,9,20,0.7)':'rgba(124,58,237,0.5)'),
+          borderColor:YEARLY.map(d=>d.count>1000?'rgba(229,9,20,1)':'rgba(124,58,237,0.8)'),
+          borderWidth:1,borderRadius:3,
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},
+          tooltip:{callbacks:{label:v=>`${v.raw.toLocaleString()} movies`}}},
+        scales:{
+          x:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
+          y:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},
+            title:{display:true,text:'Releases',color:'#555',font:{size:10}}}
+        }
+      }
+    });
+  }
+
+  // DECADE
+  const dCtx=document.getElementById('decadeChart');
+  if(dCtx){
+    new Chart(dCtx,{
+      type:'doughnut',
+      data:{
+        labels:['Pre-1960','1960s','1970s','1980s','1990s','2000–2005'],
+        datasets:[{
+          data:[447,405,530,1626,5387,9032],
+          backgroundColor:['rgba(229,9,20,0.7)','rgba(245,158,11,0.7)','rgba(124,58,237,0.7)','rgba(0,212,255,0.7)','rgba(34,197,94,0.7)','rgba(239,68,68,0.7)'],
+          borderColor:'rgba(255,255,255,0.05)',borderWidth:2,
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,cutout:'60%',
+        plugins:{legend:{position:'right',labels:{color:'#888',font:{size:10},boxWidth:10}}}
+      }
+    });
+  }
+
+  // GROWTH
+  const gCtx=document.getElementById('growthChart');
+  if(gCtx){
+    let cum=0;
+    const growthData=YEARLY.map(d=>{cum+=d.count;return cum;});
+    new Chart(gCtx,{
+      type:'line',
+      data:{
+        labels:YEARLY.map(d=>d.year),
+        datasets:[{
+          label:'Cumulative Titles',
+          data:growthData,
+          borderColor:'rgba(0,212,255,0.8)',
+          backgroundColor:'rgba(0,212,255,0.05)',
+          fill:true,tension:0.4,borderWidth:2,pointRadius:0,pointHoverRadius:4,
+          pointHoverBackgroundColor:'rgba(0,212,255,1)'
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
+          y:{ticks:{color:'#666',font:{size:10},callback:v=>(v/1000).toFixed(0)+'K'},
+             grid:{color:'rgba(255,255,255,0.04)'}}
+        }
+      }
+    });
+  }
+}
+setTimeout(initCharts,2500);
+
+// ═══════════════════════════════════════
+// AI RECOMMENDATIONS
+// ═══════════════════════════════════════
+function setPreset(el,text){
+  document.querySelectorAll('.rec-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('rec-query').value=text;
+}
+
+function getApiBaseCandidates(){
+  const bases=[];
+  if(window.location.protocol!=='file:' && window.location.origin){
+    bases.push(window.location.origin);
+  }
+  ['3000','3001'].forEach(port=>{
+    bases.push(`http://localhost:${port}`);
+    bases.push(`http://127.0.0.1:${port}`);
+  });
+  return [...new Set(bases)];
+}
+
+async function fetchApi(path,options={}){
+  let lastError;
+  for(const base of getApiBaseCandidates()){
+    try{
+      const response=await fetch(`${base}${path}`,options);
+      const text=await response.text();
+      let data={};
+      if(text.trim()){
+        try{
+          data=JSON.parse(text);
+        }catch(e){
+          throw new Error(`Server returned non-JSON response (${response.status}): ${text.substring(0,120)}`);
+        }
+      }
+      if(!response.ok){
+        const apiError=typeof data.error==='string'
+          ? data.error
+          : data.error?.message || `API request failed (${response.status})`;
+        throw new Error(data.run?`${apiError} Run: ${data.run}`:apiError);
+      }
+      return data;
+    }catch(err){
+      lastError=err;
+    }
+  }
+  throw lastError||new Error('Could not connect to the local recommendation server.');
+}
+
+async function loadModelStatus(){
+  try{
+    renderModelStatus(await fetchApi('/api/model'));
+  }catch(err){
+    renderModelStatus({
+      available:false,
+      model_path:'artifacts/svd_model.joblib',
+      status:'offline',
+      run:'start_cineai.bat'
+    });
+  }
+}
+
+function renderModelStatus(model){
+  const dot=document.getElementById('model-status-dot');
+  const title=document.getElementById('model-status-title');
+  const meta=document.getElementById('model-status-meta');
+  const pathEl=document.getElementById('model-status-path');
+  if(!dot||!title||!meta||!pathEl)return;
+
+  dot.classList.toggle('ready',Boolean(model.available));
+  title.textContent=model.available?'JOBLIB MODEL READY':'JOBLIB MODEL MISSING';
+  const updated=model.modified_at?` Updated ${formatModelDate(model.modified_at)}.`:'';
+  meta.textContent=model.available
+    ? `${model.model_class||'surprise.SVD'} saved with ${model.model_library||'joblib'} (${model.size_label||'size unknown'}).${updated}`
+    : `Run ${model.run||'python dump_model.py'} to create the saved SVD artifact.`;
+  pathEl.textContent=model.model_path||'artifacts/svd_model.joblib';
+}
+
+function formatModelDate(value){
+  const date=new Date(value);
+  if(Number.isNaN(date.getTime()))return value;
+  return date.toLocaleString([],{
+    year:'numeric',month:'short',day:'numeric',
+    hour:'2-digit',minute:'2-digit'
+  });
+}
+
+async function getRecommendations(){
+  const query=document.getElementById('rec-query').value.trim();
+  if(!query){alert('Please enter a movie name or Netflix customer id.');return;}
+  
+  const btn=document.getElementById('rec-btn');
+  const statusEl=document.getElementById('rec-status');
+  const bodyEl=document.getElementById('rec-body');
+  
+  btn.disabled=true;
+  document.getElementById('rec-btn-text').textContent='LOADING MODEL...';
+  statusEl.textContent='PROCESSING';statusEl.style.color='var(--gold)';
+  
+  // Show shimmer
+  bodyEl.innerHTML=`<div class="rec-loading">
+    <div style="font-size:0.75rem;color:var(--muted);font-family:'Orbitron',monospace;margin-bottom:0.5rem;">SVD MODEL IS RANKING TITLES...</div>
+    <div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>
+    <div class="shimmer"></div><div class="shimmer"></div>
+  </div>`;
+
+  try{
+    const userMatch=query.match(/\d{4,}/);
+    const data=await fetchApi('/api/recommendations',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        query,
+        userId:userMatch?Number(userMatch[0]):undefined,
+        limit:5
+      })
+    });
+    
+    statusEl.textContent='COMPLETE';statusEl.style.color='var(--cyan)';
+    renderRecommendations(data,query);
+  }catch(err){
+    statusEl.textContent='ERROR';statusEl.style.color='var(--red)';
+    bodyEl.innerHTML=`<div style="padding:1rem;color:var(--muted);font-size:0.85rem;">
+      <p style="color:var(--red);margin-bottom:0.5rem;">⚠ API Error</p>
+      <p>${err.message}</p>
+      <p style="margin-top:0.5rem;font-size:0.75rem;">Run start_cineai.bat from the Netflix project folder, then refresh this page.</p>
+    </div>`;
+  }finally{
+    btn.disabled=false;
+    document.getElementById('rec-btn-text').textContent='GET MODEL PREDICTIONS';
+  }
+}
+
+function renderRecommendations(data,query){
+  const bodyEl=document.getElementById('rec-body');
+  const recs=data.recommendations||[];
+  
+  bodyEl.innerHTML=`
+    <div style="font-size:0.72rem;color:var(--muted);font-family:'Orbitron',monospace;margin-bottom:1rem;padding:0.6rem;background:rgba(229,9,20,0.05);border-radius:8px;border-left:2px solid var(--red);">
+      QUERY: "${query}"
+    </div>
+    ${recs.map((r,i)=>`
+      <div class="rec-movie">
+        <div class="rec-movie-num">${String(i+1).padStart(2,'0')}</div>
+        <div class="rec-movie-info">
+          <div class="rec-movie-title">${r.title}</div>
+          <div class="rec-movie-meta">📅 ${r.year} · ${r.reason}</div>
+        </div>
+        <div class="rec-score">
+          <div class="rec-score-val">${r.score}%</div>
+          <div class="score-bar"><div class="score-fill" style="width:${r.score}%"></div></div>
+        </div>
+      </div>
+    `).join('')}
+    ${data.ai_note?`<div class="rec-ai-note"><strong>MODEL INSIGHT:</strong> ${data.ai_note}</div>`:''}
+  `;
+}
+
+loadModelStatus();
+
+// ═══════════════════════════════════════
+// MOBILE MENU
+// ═══════════════════════════════════════
+function toggleMenu(){
+  const links=document.querySelector('.nav-links');
+  links.style.display=links.style.display==='flex'?'none':'flex';
+  links.style.flexDirection='column';
+  links.style.position='absolute';
+  links.style.top='70px';links.style.left=0;links.style.right=0;
+  links.style.background='rgba(6,6,9,0.98)';
+  links.style.padding='1rem';links.style.borderBottom='1px solid var(--glass-border)';
+}
+
+// ═══════════════════════════════════════
+// NAVBAR SCROLL
+// ═══════════════════════════════════════
+window.addEventListener('scroll',()=>{
+  const nav=document.getElementById('navbar');
+  nav.style.background=window.scrollY>50?'rgba(6,6,9,0.95)':'rgba(6,6,9,0.7)';
+});
+
+// ═══════════════════════════════════════
+// MOUSE GLOW
+// ═══════════════════════════════════════
+document.addEventListener('mousemove',e=>{
+  const x=e.clientX/window.innerWidth*100;
+  const y=e.clientY/window.innerHeight*100;
+  document.body.style.setProperty('--mx',x+'%');
+  document.body.style.setProperty('--my',y+'%');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,410 @@
+{
+  "model": "surprise.SVD",
+  "source_notebook": "Netflix_.ipynb",
+  "user_id": 1331154,
+  "train_rows": 100000,
+  "prediction_limit": 50,
+  "exclude_rated": false,
+  "recommendations": [
+    {
+      "movie_id": 5,
+      "title": "The Rise and Fall of ECW",
+      "year": 2004,
+      "estimate_score": 4.506581,
+      "score": 90,
+      "reason": "SVD predicted 4.51/5 for user 1331154"
+    },
+    {
+      "movie_id": 8,
+      "title": "What the #$*! Do We Know!?",
+      "year": 2004,
+      "estimate_score": 3.813875,
+      "score": 76,
+      "reason": "SVD predicted 3.81/5 for user 1331154"
+    },
+    {
+      "movie_id": 25,
+      "title": "Inspector Morse 31: Death Is Now My Neighbour",
+      "year": 1997,
+      "estimate_score": 3.808876,
+      "score": 76,
+      "reason": "SVD predicted 3.81/5 for user 1331154"
+    },
+    {
+      "movie_id": 30,
+      "title": "Something's Gotta Give",
+      "year": 2003,
+      "estimate_score": 3.772509,
+      "score": 75,
+      "reason": "SVD predicted 3.77/5 for user 1331154"
+    },
+    {
+      "movie_id": 3,
+      "title": "Character",
+      "year": 1997,
+      "estimate_score": 3.758628,
+      "score": 75,
+      "reason": "SVD predicted 3.76/5 for user 1331154"
+    },
+    {
+      "movie_id": 28,
+      "title": "Lilo and Stitch",
+      "year": 2002,
+      "estimate_score": 3.746579,
+      "score": 75,
+      "reason": "SVD predicted 3.75/5 for user 1331154"
+    },
+    {
+      "movie_id": 12746,
+      "title": "Starting Over",
+      "year": 1979,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12751,
+      "title": "Wendigo",
+      "year": 2002,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12750,
+      "title": "Indiscretion of an American Wife",
+      "year": 1954,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12749,
+      "title": "Carnosaur",
+      "year": 1993,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12748,
+      "title": "Star Trek: Generations",
+      "year": 1994,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12747,
+      "title": "Time Out",
+      "year": 2001,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12745,
+      "title": "River's Edge",
+      "year": 1986,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12753,
+      "title": "Classic Albums: Elton John: Goodbye Yellow Brick Road",
+      "year": 2001,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12744,
+      "title": "Who's That Knocking at My Door?",
+      "year": 1969,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12743,
+      "title": "Black Rain",
+      "year": 1989,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12742,
+      "title": "Cat on a Hot Tin Roof",
+      "year": 1984,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12741,
+      "title": "The Specialist",
+      "year": 1994,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12752,
+      "title": "Pippi Longstocking",
+      "year": 1974,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12756,
+      "title": "Once and Again: Season 2",
+      "year": 2000,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12754,
+      "title": "Doomsday Gun",
+      "year": 1994,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12755,
+      "title": "WWE: The Monday Night War",
+      "year": 1995,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12739,
+      "title": "Max",
+      "year": 2002,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12757,
+      "title": "Patlabor 2: The Movie",
+      "year": 1993,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12758,
+      "title": "Schoolhouse Rock!: Special 30th Anniversary Edition",
+      "year": 1973,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12759,
+      "title": "7th Heaven: Season 2",
+      "year": 1997,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12760,
+      "title": "Crimes of the Heart",
+      "year": 1986,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12761,
+      "title": "Jackie Chan Adventures: The Search for the Talismans",
+      "year": 2001,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12762,
+      "title": "Michael Crawford in Concert",
+      "year": 1998,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12763,
+      "title": "Enemy Mine",
+      "year": 1985,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12764,
+      "title": "Social Distortion: Live in Orange County",
+      "year": 2004,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12765,
+      "title": "Black Cat Run",
+      "year": 1998,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12766,
+      "title": "It's My Party",
+      "year": 1996,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12740,
+      "title": "Tales of the Kama Sutra 2: Monsoon",
+      "year": 1998,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12736,
+      "title": "The Whole Wide World",
+      "year": 1996,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12738,
+      "title": "Microcosmos",
+      "year": 1996,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12737,
+      "title": "In Cold Blood",
+      "year": 1996,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12712,
+      "title": "Geobreeders",
+      "year": 1999,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12713,
+      "title": "Crusader",
+      "year": 2005,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12714,
+      "title": "The Great Train Robbery",
+      "year": 1978,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12715,
+      "title": "Great People of the Bible: Abraham",
+      "year": 2003,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12716,
+      "title": "Rosemary & Thyme: Series 1",
+      "year": 2003,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12717,
+      "title": "Born Innocent",
+      "year": 1974,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12718,
+      "title": "Frasier: Season 2",
+      "year": 1994,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12719,
+      "title": "Elling",
+      "year": 2001,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12720,
+      "title": "Winter Sleepers",
+      "year": 2000,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12721,
+      "title": "Ikiru",
+      "year": 1952,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12722,
+      "title": "Tom and Jerry: Spotlight Collection: Vol. 1",
+      "year": 2004,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12723,
+      "title": "Taste of Cherry",
+      "year": 1997,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    },
+    {
+      "movie_id": 12724,
+      "title": "Born Losers",
+      "year": 1967,
+      "estimate_score": 3.637477,
+      "score": 73,
+      "reason": "SVD predicted 3.64/5 for user 1331154"
+    }
+  ]
+}
