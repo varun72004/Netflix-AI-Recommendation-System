@@ -1,3 +1,4 @@
 .env
+combined_data_*.txt
 artifacts/*.pkl
 artifacts/*.joblib
